@@ -1,24 +1,104 @@
-import { ScrollView, StyleSheet } from "react-native";
+import { NativeModules, RefreshControl, ScrollView, StyleSheet } from "react-native";
 
 import { Text, View } from "@/components/Themed";
-import { FontAwesome } from "@expo/vector-icons";
 import PlanCard from "@/components/PlanCard";
+import { useCallback, useEffect, useState } from "react";
+
+function getDayOfWeek(dateString: string): string {
+  try {
+    const dateObject: Date = new Date(
+      dateString.replace(/(\d{2}).(\d{2}).(\d{4})/, "$3-$2-$1")
+    );
+
+    const daysOfWeek: string[] = [
+      "Sonntag",
+      "Montag",
+      "Dienstag",
+      "Mittwoch",
+      "Donnerstag",
+      "Freitag",
+      "Samstag",
+    ];
+
+    return daysOfWeek[dateObject.getDay()];
+  } catch (error) {
+    return "Ungültiges Datumsformat. Bitte geben Sie ein Datum im Format 'dd.mm.yyyy' an.";
+  }
+}
+
+export type VplanData = {
+  class_name: string;
+  school_name: string;
+  position: string;
+  teacher: string;
+  subject: string;
+  room: string;
+  vteacher: string;
+  vsubject: string;
+  vroom: string;
+  merkmal: string;
+  info: string;
+};
 
 export default function SubstitutionPlan() {
+  const [refreshing, setRefreshing] = useState(false);
+  const [vplanData, setVplanData] = useState<[]>([]);
+  const [edited, setEdited] = useState("");
+  const [date, setDate] = useState("");
+
+  const fetchVplanData = async () => {
+    try {
+      const res = await fetch("http://192.168.178.43/fls-vertretungsplan");
+      const data = await res.json();
+
+      setEdited(data[Object.keys(data)[0]]);
+      setDate(Object.keys(data)[1]);
+
+      const vplanData: [] = data[Object.keys(data)[1]];
+      setVplanData(vplanData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVplanData();
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    fetchVplanData();
+    setRefreshing(false);
+  }, []);
+
+  const {StatusBarManager} = NativeModules;
+
   return (
     <View style={styles.container}>
+      <View style={{ backgroundColor: "#bfbfbf", height: StatusBarManager.HEIGHT }}></View>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>Montag</Text>
-        <Text style={styles.textAccent}>04.03.2024</Text>
+        <Text style={styles.title}>{getDayOfWeek(date)}</Text>
+        <Text style={styles.textAccent}>{date}</Text>
       </View>
-      <Text style={{ ...styles.textAccent, textAlign: "center", marginTop: 18 }}>
-        Letzte Aktualisierung 04.03.2024 16:20 h
+      <Text
+        style={{ ...styles.textAccent, textAlign: "center", marginTop: 18 }}
+      >
+        Letzte Aktualisierung {edited} h
       </Text>
-      <ScrollView style={styles.cardScrollContainer}>
-        <PlanCard />
-        <PlanCard />
-        <PlanCard />
-        <PlanCard />
+      <ScrollView
+        style={styles.cardScrollContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {vplanData.map((dataArr: VplanData[], outerIndex) =>
+          dataArr.map((data: VplanData, innerIndex: number) => (
+            <PlanCard
+              key={`${outerIndex}-${innerIndex}`}
+              vplanData={data}
+              date={date}
+            />
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -33,7 +113,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   headerContainer: {
-    paddingTop: 48,
+    paddingTop: 18,
     alignItems: "center",
     justifyContent: "center",
     gap: 3,

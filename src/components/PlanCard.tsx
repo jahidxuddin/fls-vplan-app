@@ -1,29 +1,72 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { Text, View } from "./Themed";
 import { StyleSheet } from "react-native";
+import { VplanData } from "@/app/(tabs)";
 
-export default function PlanCard() {
+function removeYear(datum: string): string {
+  const teile = datum.split('.');
+  teile.pop();
+
+  return teile.join('.');
+}
+
+export default function PlanCard({
+  vplanData,
+  date,
+}: {
+  vplanData: VplanData;
+  date: string;
+}) {
   return (
     <View style={styles.cardContainer}>
       <View style={styles.cardContainerHeader}>
-        <Text style={{ fontWeight: 'bold' }}>11/2 W</Text>
-        <Text>04.03., 1.-2.</Text>
+        <Text style={{ fontWeight: "bold" }}>{vplanData.class_name}</Text>
+        <Text>
+          {removeYear(date)}, {vplanData.position}
+        </Text>
       </View>
       <View style={styles.cardContainerContent}>
         <Text>
-          Mathematik{" "}
-          <Text style={styles.textAccent}>bei Herr Metz in Raum A209</Text>
+          {vplanData.subject}{" "}
+          <Text style={styles.textAccent}>
+            bei {vplanData.teacher} in Raum {vplanData.room}
+          </Text>
         </Text>
-        <Text style={styles.cardContainerAccent}>Vertretung</Text>
-        <View style={styles.cardContainerRow}>
-          <FontAwesome style={{ marginLeft: 3 }} size={28} name="user" color="#7f8690" />
-          <Text style={styles.textAccent}>C. Aehlich</Text>
+        {vplanData.info.includes("Klasse frei") && (
+          <Text style={styles.cardContainerAccent}>Entfall</Text>
+        )}
+        {vplanData.info.includes("Vertreten") && (
+          <Text style={styles.cardContainerAccent}>Vertretung</Text>
+        )}
+        {vplanData.vroom.includes("Exkursion") && (
+          <Text style={styles.cardContainerAccent}>Ekursion</Text>
+        )}
+        {(vplanData.vroom.length > 0 && vplanData.vroom !== "Exkursion") && (
+          <Text style={styles.cardContainerAccent}>Raumänderung {vplanData.vroom}</Text>
+        )}
+        {vplanData.vteacher.length > 0 && (
+          <View style={styles.cardContainerRow}>
+            <FontAwesome
+              style={{ marginLeft: 3 }}
+              size={28}
+              name="user"
+              color="#7f8690"
+            />
+            <Text style={styles.textAccent}>{vplanData.vteacher}</Text>
+          </View>
+        )}
+      </View>
+      {vplanData.merkmal.length > 0 && (
+        <View style={styles.cardContainerFooter}>
+          <FontAwesome
+            style={{ marginLeft: 3 }}
+            size={28}
+            name="info"
+            color="#7f8690"
+          />
+          <Text style={styles.textAccent}>{vplanData.merkmal}</Text>
         </View>
-      </View>
-      <View style={styles.cardContainerFooter}>
-        <FontAwesome style={{ marginLeft: 3 }} size={28} name="info" color="#7f8690" />
-        <Text style={styles.textAccent}>Vertreten - Nachschreibearbeit Religion</Text>
-      </View>
+      )}
     </View>
   );
 }
@@ -39,7 +82,7 @@ const styles = StyleSheet.create({
     shadowOffset: {
       width: 0,
       height: 2,
-    }
+    },
   },
   cardContainerHeader: {
     flexDirection: "row",
