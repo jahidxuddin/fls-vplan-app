@@ -1,14 +1,25 @@
-import { StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from "react-native";
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from "@/components/Themed";
+import { FontAwesome } from "@expo/vector-icons";
+import PlanCard from "@/components/PlanCard";
 
-export default function TabOneScreen() {
+export default function SubstitutionPlan() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Montag</Text>
+        <Text style={styles.textAccent}>04.03.2024</Text>
+      </View>
+      <Text style={{ ...styles.textAccent, textAlign: "center", marginTop: 18 }}>
+        Letzte Aktualisierung 04.03.2024 16:20 h
+      </Text>
+      <ScrollView style={styles.cardScrollContainer}>
+        <PlanCard />
+        <PlanCard />
+        <PlanCard />
+        <PlanCard />
+      </ScrollView>
     </View>
   );
 }
@@ -16,16 +27,23 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: "bold",
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  headerContainer: {
+    paddingTop: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 3,
+  },
+  textAccent: {
+    color: "#7f8690",
+  },
+  cardScrollContainer: {
+    flex: 1,
+    marginVertical: 10,
+    paddingHorizontal: 24,
   },
 });
