@@ -82,7 +82,7 @@ export default function SubstitutionPlan() {
       <Text
         style={{ ...styles.textAccent, textAlign: "center", marginTop: 18 }}
       >
-        Letzte Aktualisierung {edited} h
+        {edited && `Letzte Aktualisierung ${edited} h`}
       </Text>
       <ScrollView
         style={styles.cardScrollContainer}
@@ -90,6 +90,9 @@ export default function SubstitutionPlan() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        {vplanData.length === 0 && (
+          <Text style={{ textAlign: "center", fontSize: 24 }}>Keine Daten verfügbar</Text>
+        )}
         {vplanData.map((dataArr: VplanData[], outerIndex) =>
           dataArr.map((data: VplanData, innerIndex: number) => (
             <PlanCard
