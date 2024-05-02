@@ -56,13 +56,10 @@ export default function SubstitutionPlan() {
       const res = await fetch("http://192.168.178.43:3000");
       const data = await res.json();
 
-      setEdited(data[Object.keys(data)[0]]);
-      console.log(data[Object.keys(data)[0]]);
+      setEdited(data.edited);
+      setDate(data.tables[0].date);
       
-      setDate(Object.keys(data)[0]);
-
-      const vplanData = data[Object.keys(data)[0]];
-
+      const vplanData = data.tables[0].rows;
       setVplanData(vplanData);
     } catch (error) {
       console.log(error);
@@ -92,7 +89,7 @@ export default function SubstitutionPlan() {
       <Text
         style={{ ...styles.textAccent, textAlign: "center", marginTop: 18 }}
       >
-        {edited && `Letzte Aktualisierung ${edited} h`}
+        {edited && `Letzte Aktualisierung ${edited} Uhr`}
       </Text>
       <ScrollView
         style={styles.cardScrollContainer}
@@ -106,7 +103,9 @@ export default function SubstitutionPlan() {
               Keine Daten verfügbar
             </Text>
           ) : (
-            vplanData.map((data, i) => <></>)
+            vplanData.map((data, i) => (
+              <PlanCard key={i} vplanData={data} date={date} />
+            ))
           )}
         </>
       </ScrollView>
