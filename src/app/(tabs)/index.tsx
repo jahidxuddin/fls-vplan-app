@@ -1,4 +1,9 @@
-import { NativeModules, RefreshControl, ScrollView, StyleSheet } from "react-native";
+import {
+  NativeModules,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 
 import { Text, View } from "@/components/Themed";
 import PlanCard from "@/components/PlanCard";
@@ -42,19 +47,22 @@ export type VplanData = {
 
 export default function SubstitutionPlan() {
   const [refreshing, setRefreshing] = useState(false);
-  const [vplanData, setVplanData] = useState<[]>([]);
+  const [vplanData, setVplanData] = useState<VplanData[]>([]);
   const [edited, setEdited] = useState("");
   const [date, setDate] = useState("");
 
   const fetchVplanData = async () => {
     try {
-      const res = await fetch("http://192.168.178.43/fls-vertretungsplan");
+      const res = await fetch("http://192.168.178.43:3000");
       const data = await res.json();
 
       setEdited(data[Object.keys(data)[0]]);
-      setDate(Object.keys(data)[1]);
+      console.log(data[Object.keys(data)[0]]);
+      
+      setDate(Object.keys(data)[0]);
 
-      const vplanData: [] = data[Object.keys(data)[1]];
+      const vplanData = data[Object.keys(data)[0]];
+
       setVplanData(vplanData);
     } catch (error) {
       console.log(error);
@@ -70,11 +78,13 @@ export default function SubstitutionPlan() {
     setRefreshing(false);
   }, []);
 
-  const {StatusBarManager} = NativeModules;
+  const { StatusBarManager } = NativeModules;
 
   return (
     <View style={styles.container}>
-      <View style={{ backgroundColor: "#bfbfbf", height: StatusBarManager.HEIGHT }}></View>
+      <View
+        style={{ backgroundColor: "#bfbfbf", height: StatusBarManager.HEIGHT }}
+      ></View>
       <View style={styles.headerContainer}>
         <Text style={styles.title}>{getDayOfWeek(date)}</Text>
         <Text style={styles.textAccent}>{date}</Text>
@@ -90,18 +100,15 @@ export default function SubstitutionPlan() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {vplanData.length === 0 && (
-          <Text style={{ textAlign: "center", fontSize: 24 }}>Keine Daten verfügbar</Text>
-        )}
-        {vplanData.map((dataArr: VplanData[], outerIndex) =>
-          dataArr.map((data: VplanData, innerIndex: number) => (
-            <PlanCard
-              key={`${outerIndex}-${innerIndex}`}
-              vplanData={data}
-              date={date}
-            />
-          ))
-        )}
+        <>
+          {vplanData.length === 0 || vplanData === undefined ? (
+            <Text style={{ textAlign: "center", fontSize: 24 }}>
+              Keine Daten verfügbar
+            </Text>
+          ) : (
+            vplanData.map((data, i) => <></>)
+          )}
+        </>
       </ScrollView>
     </View>
   );

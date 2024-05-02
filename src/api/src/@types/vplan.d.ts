@@ -1,4 +1,4 @@
-type RowData = {
+type Row = {
   class_name: string;
   school_name: string;
   position: string;
@@ -10,4 +10,13 @@ type RowData = {
   vroom: string;
   merkmal: string;
   info: string;
+};
+
+type Table = {
+  rows: Row[];
+};
+
+type VPlanData = {
+  edited: string;
+  tables: Table[];
 };
