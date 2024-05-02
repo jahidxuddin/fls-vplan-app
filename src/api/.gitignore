@@ -1,12 +1,3 @@
-# Ignore the vendor directory created by Composer
-/vendor/
-
-# Ignore Composer's autoloader file
-/vendor/autoload.php
-
-# Ignore Composer's lock file
-composer.lock
-
 # Logs
 logs
 *.log
