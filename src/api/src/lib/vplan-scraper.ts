@@ -4,7 +4,11 @@ import { load } from "cheerio";
 function scrapeLastEdited($: cheerio.Root, spacePattern: RegExp): string {
   let edited = "Unknown";
   $("p.stand").each((_index, el) => {
-    edited = $(el).text().replace(spacePattern, " ").trim();
+    edited = $(el)
+      .text()
+      .replace(spacePattern, " ")
+      .match(/\s+(\d{2}.\d{2}.\d{4}),\s+(\d{2}:\d{2})\s+/)[0]
+      .trim();
   });
   return edited;
 }
@@ -29,7 +33,9 @@ export default async function scrapeVPlan(): Promise<VPlanData> {
           .attr("summary")
           ?.match(/\d{2}\.\d{2}\.\d{4}/);
         const date = dateMatch[0];
-        data.tables[date] = [];
+        data.tables[date] = {
+          rows: [],
+        };
 
         $(vPlan)
           .find("tr")
@@ -40,7 +46,7 @@ export default async function scrapeVPlan(): Promise<VPlanData> {
 
             if ($(tr).hasClass("vplan_class_title")) return;
 
-            const rowData: Row = {
+            const rowData: VPlanRow = {
               class_name: td
                 .eq(0)
                 .text()
@@ -61,11 +67,11 @@ export default async function scrapeVPlan(): Promise<VPlanData> {
               merkmal: td.eq(9).text().trim().replace(whitespacePattern, " "),
               info: td.eq(10).text().trim().replace(whitespacePattern, " "),
             };
-        
-            data.tables[date].push(rowData);
+
+            data.tables[date].rows.push(rowData);
           });
 
-        data.tables[date].shift();
+        data.tables[date].rows.shift();
       });
 
     return data;

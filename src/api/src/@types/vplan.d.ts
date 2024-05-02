@@ -1,4 +1,4 @@
-type Row = {
+type VPlanRow = {
   class_name: string;
   school_name: string;
   position: string;
@@ -12,11 +12,12 @@ type Row = {
   info: string;
 };
 
-type Table = {
-  rows: Row[];
+type VPlanTable = {
+  date: string;
+  rows: VPlanRow[];
 };
 
 type VPlanData = {
   edited: string;
-  tables: Table[];
+  tables: VPlanTable[];
 };
