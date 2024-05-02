@@ -33,9 +33,13 @@ export default async function scrapeVPlan(): Promise<VPlanData> {
           .attr("summary")
           ?.match(/\d{2}\.\d{2}\.\d{4}/);
         const date = dateMatch[0];
-        data.tables[date] = {
+
+        data.tables.push({
+          date: date,
           rows: [],
-        };
+        });
+
+        const i = data.tables.findIndex(table => table.date === date);
 
         $(vPlan)
           .find("tr")
@@ -68,10 +72,10 @@ export default async function scrapeVPlan(): Promise<VPlanData> {
               info: td.eq(10).text().trim().replace(whitespacePattern, " "),
             };
 
-            data.tables[date].rows.push(rowData);
+           data.tables[i].rows.push(rowData);
           });
 
-        data.tables[date].rows.shift();
+        data.tables[i].rows.shift();
       });
 
     return data;
